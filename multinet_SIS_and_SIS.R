@@ -2,11 +2,12 @@
 library(multinet)
 
 # definicja seed
-set.seed(1313)
+#set.seed(1313)
 
 # wczytanie sieci 
 fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
 #net<- read_ml ("Exsperiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
+
 #parametry sieci
 numberOfActors <- num_actors_ml(fullnet)
 numberOfActorsInLayer <- num_actors_ml(fullnet,"advice")
@@ -23,24 +24,35 @@ gamma <- 0.03 # wyzdrowienia
 numberOfSusceptible <- numberOfActorsInLayer
 numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
+
+# Stan pocz¹tkowy dla macierzy licznoœci 
 SIR_group_States <- matrix(rbind(0,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
+
 # zmienne pomocnicze
 new_infected <-NULL # nowe zachorowania
 new_recovered <-NULL # nowe ozdrowienia
 
-#dodanie atrybutów (state -stan dla SIR, beta - prawdopodobieñstwo)
+#dodanie atrybutów (state -stan dla SIR, SIRbeta - prawdopodobieñstwo)
 add_attributes_ml(fullnet, "state", type = "string", target="actor", layer ="")
+add_attributes_ml(fullnet, "SIR_beta", type = "numeric", target = "actor", layer = "")
+add_attributes_ml(fullnet, "awareness", type ="string", target ="actor", layer = "")
 add_attributes_ml(fullnet, "beta", type = "numeric", target = "actor", layer = "")
+
 
 #ustawienie wartoœci atrybutu state dla SIR domyœlnie na S
 set_values_ml(fullnet, "state",actors_ml(fullnet,"advice"), values ="S" )
-get_values_ml(fullnet,"state",actors_ml(fullnet, "advice"))
+set_values_ml(fullnet, "awareness",actors_ml(fullnet), values ="S" )
+set_values_ml(fullnet, "SIR_beta",actors_ml(fullnet), values = beta)
+set_values_ml(fullnet, "beta",actors_ml(fullnet), values = beta)
 
+#sprawdzenie ustawionych wartoœci 
+#get_values_ml(fullnet,"state",actors_ml(fullnet))
+#get_values_ml(fullnet,"awareness",actors_ml(fullnet))
+#get_values_ml(fullnet,"beta",actors_ml(fullnet))
+#get_values_ml(fullnet,"SIR_beta",actors_ml(fullnet))
 
-# set_values_ml(fullnet, "beta",actors_ml(fullnet), values = 0.3)
-# get_values_ml(fullnet, "beta", actors_ml(fullnet))
 advice<-actors_ml(fullnet,"advice")
-d <- as.data.frame(fullnet)
+
 
 # stan pocz¹tkowy dla I ---------------------------------------------------
 # (A)losowo X osób 
@@ -142,6 +154,10 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
      	  timeline_SIR <- cbind(timeline,lastStateSIR)
 	}
+
+# Operacje IO - zapis, katalog roboczy -------------------------------------
+getwd()
+
 
 # Zapis poszczególnych stanów SIR do pliku CSV
 write.csv(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.csv", row.names = TRUE)
