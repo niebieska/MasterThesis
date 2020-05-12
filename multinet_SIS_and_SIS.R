@@ -7,19 +7,23 @@ set.seed(1313)
 # wczytanie sieci 
 fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
 
+#parametry sieci
+numberOfActors <- num_actors_ml(fullnet)
+numberOfActorsInLayer <- num_actors_ml(fullnet,"advice")
+
 # definicje zmiennych
 #czas trwania "epidemii" -  liczba dni
-time <- 100
+time <- 20
 
 # prawdopodobieñstwa
 beta <- 0.85 # zara¿enia
 gamma <- 0.03 # wyzdrowienia
 
 #Stan SIR
-numberOfSusceptible <- num_actors_ml(fullnet, "advice")
+numberOfSusceptible <- numberOfActorsInLayer
 numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
-
+SIR_group_States <- matrix(rbind(0,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
 # zmienne pomocnicze
 new_infected <-NULL # nowe zachorowania
 new_recovered <-NULL # nowe ozdrowienia
@@ -67,19 +71,23 @@ while (n>0)
 }
 
 
-timeline<- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
+timeline_SIR<- as.matrix( actors_ml(fullnet,"advice"))
+timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"advice")))
 
 #dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
  #dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
 
+
 	  for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
-	{  # wipisuje - Stan SIR na konsole 
+	{  # wypisuje - Stan SIR na konsole 
+	   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
 	   print(paste("Dzieñ epidemii:", i)) 
 	   print(paste("Susceptible", numberOfSusceptible)) 
 	   print(paste("Infected", numberOfInfected)) 
 	   print(paste("Recovered", numberOfRecovered)) 
 	   
-	   if(numberOfRecovered == num_actors_ml(fullnet, "advice")) break 
+	   if(numberOfRecovered == numberOfActorsInLayer) break 
+	   
 	   new_infected <- NULL
 	   new_recovered <- NULL
 	  
@@ -130,10 +138,13 @@ timeline<- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
 	      SUM <- numberOfInfected + numberOfRecovered + numberOfSusceptible
 	      print(paste("Suma", SUM))
 	  # zapis stanów poœrednich 
-	  memory <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
-	  
-	  timeline <- cbind(timeline,memory)
+	 
+	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
+     	  timeline_SIR <- cbind(timeline,lastStateSIR)
 	}
 
+# Zapis poszczególnych stanów SIR do pliku CSV
+write.csv(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.csv", row.names = TRUE)
 
-
+# Zapis poszczególnych stanów SIR do pliku RDS
+saveRDS(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.rds")
