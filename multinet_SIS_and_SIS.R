@@ -6,7 +6,7 @@ set.seed(1313)
 
 # wczytanie sieci 
 fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
-
+#net<- read_ml ("Exsperiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
 #parametry sieci
 numberOfActors <- num_actors_ml(fullnet)
 numberOfActorsInLayer <- num_actors_ml(fullnet,"advice")
@@ -40,7 +40,7 @@ get_values_ml(fullnet,"state",actors_ml(fullnet, "advice"))
 # set_values_ml(fullnet, "beta",actors_ml(fullnet), values = 0.3)
 # get_values_ml(fullnet, "beta", actors_ml(fullnet))
 advice<-actors_ml(fullnet,"advice")
-
+d <- as.data.frame(fullnet)
 
 # stan pocz¹tkowy dla I ---------------------------------------------------
 # (A)losowo X osób 
@@ -56,7 +56,7 @@ advice<-actors_ml(fullnet,"advice")
 # (B)losowo x % sieci - preferowane np 1% - liczymi ile to aktorów w sieci a potem losujemy tylu aktorów jako seedy
 x<-0.01
 n<- round( x * num_actors_ml(fullnet,"advice")) # dla warstwy x % aktorów z wybranej warstwy
-infected <- trunc(runif(n,1,215))
+infected <- trunc(runif(n,1,numberOfActorsInLayer))
 
 # Aktualizowanie stanu SIR
 numberOfInfected <- n
@@ -145,6 +145,8 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 
 # Zapis poszczególnych stanów SIR do pliku CSV
 write.csv(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.csv", row.names = TRUE)
-
 # Zapis poszczególnych stanów SIR do pliku RDS
 saveRDS(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.rds")
+
+# zapis zmodyfikowanej sieci do pliku - niepe³ny 
+write_ml(fullnet,file="Exsperiment_Data/net_test.mpx",format="multilayer" )
