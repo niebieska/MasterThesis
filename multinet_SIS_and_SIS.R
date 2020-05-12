@@ -50,8 +50,8 @@ advice<-actors_ml(fullnet,"advice")
 # }
 
 # (B)losowo x % sieci - preferowane np 1% - liczymi ile to aktorów w sieci a potem losujemy tylu aktorów jako seedy
-x<-0.05
-n<- trunc( x * num_actors_ml(fullnet)) # dla warstwy n<- trunc( x * num_actors_ml(fullnet, "advice"))
+x<-0.01
+n<- round( x * num_actors_ml(fullnet,"advice")) # dla warstwy x % aktorów z wybranej warstwy
 infected <- trunc(runif(n,1,215))
 
 # Aktualizowanie stanu SIR
