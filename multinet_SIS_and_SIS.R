@@ -94,37 +94,38 @@ while (n>0)
 }
 
 #uœwiadomienie wybranych osób 
-
 x<-0.10
 m<- round( x * num_actors_ml(fullnet)) # x % aktorów z ca³ej sieci
 awarened <- trunc(runif(m,1,numberOfActorsInLayer))
+
+# Aktualizowanie stanu SIR
+numberOfAwarened <- m
+numberOfUnawarened <- numberOfUnawarened -numberOfAwarened
 
 while (m>0)
 { print( paste("uœwiadamianie w toku - aktor :", awarened[m]))
   set_values_ml(fullnet, "awareness", actors[awarened[m]], values ="I" )
   #print(paste(m, get_values_ml(fullnet, "awareness",awarened[m]))) do sprawdzenia 
   m=m-1
-  
+
 }
 
 
-timeline_SIR<- as.matrix( actors_ml(fullnet,"advice"))
-timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullnet,"advice")))
-
-#dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
- #dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
-
+timeline_SIR<- as.matrix(advice)
+timeline_SIR = cbind(timeline_SIR, get_values_ml(fullnet,"state", advice ))
+timeline_SIS <- as.matrix(actors)
+timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 
 	  for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
 	{  
-	
-	
+
 	# wypisuje - Stan SIR na konsole 
 	   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
 	   print(paste("Dzieñ epidemii:", i)) 
-	   print(paste("Susceptible", numberOfSusceptible)) 
-	   print(paste("Infected", numberOfInfected)) 
-	   print(paste("Recovered", numberOfRecovered)) 
+	   print(paste("Stan SIR:", paste( paste( paste("Susceptible:", numberOfSusceptible),paste("Infected:", numberOfInfected), sep = " ; "),paste("Recovered:", numberOfRecovered),sep =" ; ")))
+	   # print(paste("Susceptible", numberOfSusceptible)) 
+	   # print(paste("Infected", numberOfInfected)) 
+	   # print(paste("Recovered", numberOfRecovered)) 
 	   
 	   if(numberOfRecovered == numberOfActorsInLayer) break 
 	   
@@ -159,7 +160,10 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 				}
 	
 				}
-			#Pêtla dla SIS
+	   
+	      print( paste("Stan SIS:", paste( paste( paste("Susceptible:", numberOfUnawarened),paste("Infected:", numberOfAwarened), sep = " ; "))))
+			
+	   #Pêtla dla SIS
 			   for(k in 1: length(actors))
 			   {
 				 if(get_values_ml(fullnet,"state",actors[k]) =="I")
@@ -192,27 +196,37 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 	   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
 	   	  if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" )
 	      if(!is.null(new_recovered))  set_values_ml(fullnet, "state",new_recovered, values ="R" )
-	      print(new_infected)
-	      print (paste("new R", length(new_recovered)))
-	      print(paste("new I", length(new_infected)))
+	      #print(new_infected)
+	      #print (paste("new R", length(new_recovered)))
+	      #print(paste("new I", length(new_infected)))
+	   
+	   #aktualizacja SIS    
+	      if(!is.null(new_awarened))  set_values_ml(fullnet, "awareness",new_awarened, values ="I" )
+	      if(!is.null(new_unawarened))  set_values_ml(fullnet, "awareness",new_unawarened, values ="S" )
 	      
-		  # Obliczenia stan SIR
-		  numberOfSusceptible = numberOfSusceptible - length(new_infected)
-	      numberOfInfected = numberOfInfected +(length(new_infected) - length(new_recovered))
-	      numberOfRecovered = numberOfRecovered + length(new_recovered)
-	      SUM <- numberOfInfected + numberOfRecovered + numberOfSusceptible
-	      print(paste("Suma", SUM))
+	# 	  # Obliczenia stan SIR
+	# 	    numberOfSusceptible = numberOfSusceptible - length(new_infected)
+	#       numberOfInfected = numberOfInfected +(length(new_infected) - length(new_recovered))
+	#       numberOfRecovered = numberOfRecovered + length(new_recovered)
+	#       SUM <- numberOfInfected + numberOfRecovered + numberOfSusceptible
+	#       print(paste("Suma", SUM))
 		  
 		  #Sprawdzenie stanu atrybutów - zawartoœæ wektora 
 		    SIR_attributes <- get_values_ml(fullnet,"state", advice)
-		    S<-length( which('S' == SIR_attributes))
-		    I<-length( which('I' == SIR_attributes))
-		    R <-length( which('R' == SIR_attributes))
+		    numberOfSusceptible <- length( which('S' == SIR_attributes))
+		    numberOfInfected <- length( which('I' == SIR_attributes))
+		    numberOfRecovered <- length( which('R' == SIR_attributes))
 		    Sum = S+I+R
-		  	  # zapis stanów poœrednich 
+		  	
+		    SIS_atributes <- get_values_ml(fullnet, "awareness", actors)  
+		    numberOfUnawarened <- length(which("S"==SIS_atributes))
+		    numberOfAwarened <- length(which("I"== SIS_atributes))
+		    
+		    # zapis stanów poœrednich 
 	 
-	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
-     	  timeline_SIR <- cbind(timeline_SIR,lastStateSIR)
+	      #lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
+     	  timeline_SIR <- cbind(timeline_SIR, SIR_attributes)
+     	  timeline_SIS <- cbind(timeline_SIS, SIS_atributes)
 	}
 
 # Operacje IO - zapis, katalog roboczy -------------------------------------
