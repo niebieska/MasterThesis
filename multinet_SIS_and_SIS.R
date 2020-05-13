@@ -6,7 +6,7 @@ library(multinet)
 
 # wczytanie sieci 
 fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
-#net<- read_ml ("Exsperiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
+#net<- read_ml ("experiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
 
 #parametry sieci
 numberOfActors <- num_actors_ml(fullnet)
@@ -111,22 +111,21 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 					neighbors <- neighbors_ml(fullnet,advice[j],"advice",mode="all")
 					for(s in 1:length(neighbors))
 					{  if(get_values_ml(fullnet, "state", neighbors[s])=="S")
-						{ value <- runif(1,0,1000)
-						  
-							if( value <= beta*1000) 
+						{ 
+							if( runif(1) < beta) 
 							  { #print( value)
+							  if(!(neighbors[s] %in% new_infected)) # is.element(neighbors[s])
 								new_infected <- cbind(new_infected,neighbors[s]) # mamy tymczasow¹ listê nowo zainfekowanych  
 								# numberOfInfected = numberOfInfected + 1 
 							#	print(paste("nowe zachorowanie, nadal zdrowi",numberOfSusceptible))
 								# if(numberOfSusceptible > 0) numberOfSusceptible = numberOfSusceptible - 1
 								}
 					  }
-					  if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" ) 				   
+					  #if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" ) 				   
 					}
 					
-					test<- runif(1,0,1000)
-					
-				if( test<= gamma*1000)
+			
+				if( runif(1) < gamma)
 					# ustaw recovered
 					{ #print(test)
 					  new_recovered=cbind(new_recovered,advice[j])
@@ -137,9 +136,9 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 	   }
 	}
 	   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
-	   	 # if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" )
+	   	  if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" )
 	      if(!is.null(new_recovered))  set_values_ml(fullnet, "state",new_recovered, values ="R" )
-	      #print(new_infected)
+	      print(new_infected)
 	      print (paste("new R", length(new_recovered)))
 	      print(paste("new I", length(new_infected)))
 	      
@@ -152,17 +151,26 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 	  # zapis stanów poœrednich 
 	 
 	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
-     	  timeline_SIR <- cbind(timeline,lastStateSIR)
+     	  timeline_SIR <- cbind(timeline_SIR,lastStateSIR)
 	}
 
 # Operacje IO - zapis, katalog roboczy -------------------------------------
+setwd("C:/Users/Paulina/Documents/SIR_experiments/Repository")
 getwd()
 
+#zmienne pomocniecze do zapisu
+experimentFolder<- "Fullnet"
+experimentDescription <- "Fullnet_SIR"
+directory <- paste("eksperyment",experimentFolder, sep="")
+
+#folder dla eksperymentów 
+dir.create(directory)
 
 # Zapis poszczególnych stanów SIR do pliku CSV
-write.csv(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.csv", row.names = TRUE)
+write.csv(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
+
 # Zapis poszczególnych stanów SIR do pliku RDS
-saveRDS(timeline_SIR,file="Exsperiment_Data/dane_test_timeline_SIR.rds")
+saveRDS(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
 
 # zapis zmodyfikowanej sieci do pliku - niepe³ny 
-write_ml(fullnet,file="Exsperiment_Data/net_test.mpx",format="multilayer" )
+#write_ml(fullnet,file="experiment_Data/net_test.mpx",format="multilayer" )
