@@ -29,15 +29,15 @@ mi <- 0.2    # zwatpienia
 numberOfSusceptible <- numberOfActorsInLayer
 numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
-SUM<- numberOfSusceptible + numberOfInfected + numberOfRecovered 
+SIR_Sum<- numberOfSusceptible + numberOfInfected + numberOfRecovered 
 
 #Stan SIS
 numberOfUnawarened <-numberOfActors
 numberOfAwarened <- 0
-
+SIS_Sum <- numberOfAwarened + numberOfUnawarened
 # Stan pocz¹tkowy dla macierzy licznoœci 
-SIR_group_States <- matrix(rbind(0,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
-
+SIR_group_States <- matrix(rbind(0,numberOfSusceptible, numberOfInfected, numberOfRecovered, SIR_Sum))
+SIS_group_States <- matrix (rbind(0, numberOfUnawarened, numberOfAwarened, SIS_Sum))
 # zmienne pomocnicze
 new_infected <- NULL # nowe zachorowania
 new_recovered <- NULL # nowe ozdrowienia
@@ -98,7 +98,7 @@ x<-0.10
 m<- round( x * num_actors_ml(fullnet)) # x % aktorów z ca³ej sieci
 awarened <- trunc(runif(m,1,numberOfActorsInLayer))
 
-# Aktualizowanie stanu SIR
+# Aktualizowanie stanu SIS
 numberOfAwarened <- m
 numberOfUnawarened <- numberOfUnawarened -numberOfAwarened
 
@@ -120,9 +120,10 @@ timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 	{  
 
 	# wypisuje - Stan SIR na konsole 
-	   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
+	   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SIR_Sum))
 	   print(paste("Dzieñ epidemii:", i)) 
 	   print(paste("Stan SIR:", paste( paste( paste("Susceptible:", numberOfSusceptible),paste("Infected:", numberOfInfected), sep = " ; "),paste("Recovered:", numberOfRecovered),sep =" ; ")))
+	   
 	   # print(paste("Susceptible", numberOfSusceptible)) 
 	   # print(paste("Infected", numberOfInfected)) 
 	   # print(paste("Recovered", numberOfRecovered)) 
@@ -162,7 +163,7 @@ timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 				}
 	   
 	      print( paste("Stan SIS:", paste( paste( paste("Susceptible:", numberOfUnawarened),paste("Infected:", numberOfAwarened), sep = " ; "))))
-			
+	      SIS_group_States <- cbind(SIS_group_States,rbind(i,numberOfUnawarened,numberOfAwarened, SIS_Sum))
 	   #Pêtla dla SIS
 			   for(k in 1: length(actors))
 			   {
@@ -216,12 +217,12 @@ timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 		    numberOfSusceptible <- length( which('S' == SIR_attributes))
 		    numberOfInfected <- length( which('I' == SIR_attributes))
 		    numberOfRecovered <- length( which('R' == SIR_attributes))
-		    Sum = S+I+R
+		    Sum = numberOfSusceptible + numberOfInfected + numberOfRecovered
 		  	
 		    SIS_atributes <- get_values_ml(fullnet, "awareness", actors)  
 		    numberOfUnawarened <- length(which("S"==SIS_atributes))
 		    numberOfAwarened <- length(which("I"== SIS_atributes))
-		    
+		    SIS_Sum <- numberOfAwarened + numberOfUnawarened 
 		    # zapis stanów poœrednich 
 	 
 	      #lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
