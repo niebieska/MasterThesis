@@ -95,7 +95,10 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 
 
 	  for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
-	{  # wypisuje - Stan SIR na konsole 
+	{  
+	
+	
+	# wypisuje - Stan SIR na konsole 
 	   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
 	   print(paste("Dzieñ epidemii:", i)) 
 	   print(paste("Susceptible", numberOfSusceptible)) 
@@ -106,7 +109,8 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 	   
 	   new_infected <- NULL
 	   new_recovered <- NULL
-	  
+			
+			# Pêtla SIR
 			for (j in 1:length(advice)) # odwiedzam po kolei aktorów
 			{ 
 				if(get_values_ml(fullnet,"state",advice[j]) =="I") # jeœli aktor jest zara¿ony
@@ -119,26 +123,23 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 							if( runif(1) < beta) 
 							  { #print( value)
 							  if(!(neighbors[s] %in% new_infected)) # is.element(neighbors[s])
-								new_infected <- cbind(new_infected,neighbors[s]) # mamy tymczasow¹ listê nowo zainfekowanych  
-								# numberOfInfected = numberOfInfected + 1 
-							#	print(paste("nowe zachorowanie, nadal zdrowi",numberOfSusceptible))
-								# if(numberOfSusceptible > 0) numberOfSusceptible = numberOfSusceptible - 1
+									new_infected <- cbind(new_infected,neighbors[s]) # mamy tymczasow¹ listê nowo zainfekowanych  							
+								#	print(paste("nowe zachorowanie, nadal zdrowi",numberOfSusceptible))
 								}
 					  }
 					  #if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" ) 				   
 					}
-					
-			
+							
 				if( runif(1) < gamma)
-					# ustaw recovered
 					{ #print(test)
-					  new_recovered=cbind(new_recovered,advice[j])
-					  # numberOfRecovered =numberOfRecovered + 1
-					  # numberOfInfected = numberOfInfected - 1 
-					 #print(paste("nowy ozdrowieniec, jeszce choruje:", numberOfInfected))
+					  if(!is.element(advice[j],new_infected)){ new_recovered=cbind(new_recovered,advice[j])}
+					  #print(paste("nowy ozdrowieniec, jeszce choruje:", numberOfInfected))
 					}
-	   }
-	}
+			}
+	
+			}
+	
+	
 	   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
 	   	  if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" )
 	      if(!is.null(new_recovered))  set_values_ml(fullnet, "state",new_recovered, values ="R" )
