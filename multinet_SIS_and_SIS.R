@@ -1,8 +1,7 @@
 # biblioteka 
 library(multinet)
-load("C:/Users/Paulina/Documents/SIR_experiments/Repository/eksperymentfullnet/timeline_statesfullnet_SIR.dat")
-# definicja seed
-#set.seed(1313)
+
+# definicja seed #set.seed(1313)
 
 # wczytanie sieci 
 fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
@@ -11,6 +10,8 @@ fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation
 #parametry sieci
 numberOfActors <- num_actors_ml(fullnet)
 numberOfActorsInLayer <- num_actors_ml(fullnet,"advice")
+advice <- actors_ml(fullnet,"advice")
+actors <- actors_ml(fullnet)
 
 # definicje zmiennych
 #czas trwania "epidemii" -  liczba dni
@@ -23,18 +24,26 @@ gamma <- 0.03 # wyzdrowienia
 # prawdopodobieñstwa SIS
 epsilon <-0.1 # odpowiednik beta, uzuskania informacji
 mi <- 0.2    # zwatpienia
+
 #Stan SIR
 numberOfSusceptible <- numberOfActorsInLayer
 numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
 SUM<- numberOfSusceptible + numberOfInfected + numberOfRecovered 
 
+#Stan SIS
+numberOfUnawarened <-numberOfActors
+numberOfAwarened <- 0
+
 # Stan pocz¹tkowy dla macierzy licznoœci 
 SIR_group_States <- matrix(rbind(0,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
 
 # zmienne pomocnicze
-new_infected <-NULL # nowe zachorowania
-new_recovered <-NULL # nowe ozdrowienia
+new_infected <- NULL # nowe zachorowania
+new_recovered <- NULL # nowe ozdrowienia
+
+new_awarened <- NULL # œwiadomi S
+new_unawarened <- NULL # nieœwiadomi versus wypieraj¹cy
 
 #dodanie atrybutów (state -stan dla SIR, SIRbeta - prawdopodobieñstwo)
 add_attributes_ml(fullnet, "state", type = "string", target="actor", layer ="")
@@ -54,8 +63,6 @@ set_values_ml(fullnet, "epsilon",actors_ml(fullnet), values = epsilon)
 #get_values_ml(fullnet,"awareness",actors_ml(fullnet))
 #get_values_ml(fullnet,"epsilon",actors_ml(fullnet))
 #get_values_ml(fullnet,"beta",actors_ml(fullnet))
-
-advice<-actors_ml(fullnet,"advice")
 
 
 # stan pocz¹tkowy dla I ---------------------------------------------------
@@ -86,6 +93,20 @@ while (n>0)
  n=n-1
 }
 
+#uœwiadomienie wybranych osób 
+
+x<-0.10
+m<- round( x * num_actors_ml(fullnet)) # x % aktorów z ca³ej sieci
+awarened <- trunc(runif(m,1,numberOfActorsInLayer))
+
+while (m>0)
+{ print( paste("uœwiadamianie w toku - aktor :", awarened[m]))
+  set_values_ml(fullnet, "awareness", actors[awarened[m]], values ="I" )
+  #print(paste(m, get_values_ml(fullnet, "awareness",awarened[m]))) do sprawdzenia 
+  m=m-1
+  
+}
+
 
 timeline_SIR<- as.matrix( actors_ml(fullnet,"advice"))
 timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullnet,"advice")))
@@ -111,33 +132,61 @@ timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullne
 	   new_recovered <- NULL
 			
 			# Pêtla SIR
-			for (j in 1:length(advice)) # odwiedzam po kolei aktorów
-			{ 
-				if(get_values_ml(fullnet,"state",advice[j]) =="I") # jeœli aktor jest zara¿ony
+				for (j in 1:length(advice)) # odwiedzam po kolei aktorów
 				{ 
-					# szukamy s¹siadów 
-					neighbors <- neighbors_ml(fullnet,advice[j],"advice",mode="all")
-					for(s in 1:length(neighbors))
-					{  if(get_values_ml(fullnet, "state", neighbors[s])=="S")
-						{ 
-							if( runif(1) < beta) 
-							  { #print( value)
-							  if(!(neighbors[s] %in% new_infected)) # is.element(neighbors[s])
-									new_infected <- cbind(new_infected,neighbors[s]) # mamy tymczasow¹ listê nowo zainfekowanych  							
-								#	print(paste("nowe zachorowanie, nadal zdrowi",numberOfSusceptible))
-								}
-					  }
-					  #if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" ) 				   
-					}
-							
-				if( runif(1) < gamma)
-					{ #print(test)
-					  if(!is.element(advice[j],new_infected)){ new_recovered=cbind(new_recovered,advice[j])}
-					  #print(paste("nowy ozdrowieniec, jeszce choruje:", numberOfInfected))
-					}
-			}
+					if(get_values_ml(fullnet,"state",advice[j]) =="I") # jeœli aktor jest zara¿ony
+					{ 
+						# szukamy s¹siadów 
+						neighbors <- neighbors_ml(fullnet,advice[j],"advice",mode="all")
+						for(s in 1:length(neighbors))
+						{  if(get_values_ml(fullnet, "state", neighbors[s])=="S")
+							{ 
+								if( runif(1) < beta) 
+								  { #print( value)
+								  if(!(neighbors[s] %in% new_infected)) # is.element(neighbors[s])
+										new_infected <- cbind(new_infected,neighbors[s]) # mamy tymczasow¹ listê nowo zainfekowanych  							
+									#	print(paste("nowe zachorowanie, nadal zdrowi",numberOfSusceptible))
+									}
+						  }
+						  #if(!is.null(new_infected))  set_values_ml(fullnet, "state",new_infected, values ="I" ) 				   
+						}
+								
+					if( runif(1) < gamma)
+						{ #print(test)
+						  if(!is.element(advice[j],new_recovered)){ new_recovered=cbind(new_recovered,advice[j])}
+						  #print(paste("nowy ozdrowieniec, jeszce choruje:", numberOfInfected))
+						}
+				}
 	
-			}
+				}
+			#Pêtla dla SIS
+			   for(k in 1: length(actors))
+			   {
+				 if(get_values_ml(fullnet,"state",actors[k]) =="I")
+				 {
+				   # poszukiwanie s¹siadów
+				   actorNeighbors <- neighbors_ml(fullnet,actors[k],"advice",mode="all")
+				   for(l in 1:length(actorNeighbors))
+				   {  
+					 if(get_values_ml(fullnet, "state", actorNeighbors[l])=="S")
+				   { 
+					 if( runif(1) < epsilon) 
+					 { #print( value)
+					   if(!(actorNeighbors[l] %in% new_awarened)) # is.element(neighbors[s])
+						 new_awarened <- cbind(new_awarened,actorNeighbors[l]) # mamy tymczasow¹ listê nowo zainfekowanych  							
+					  }
+				   }		   
+				   }
+				   				   if( runif(1) < mi)
+				   { #print(test)
+					 if(!is.element(actors[k],new_unawarened)){ new_unawarened=cbind(new_unawarened,actors[k])}
+					 
+				   }
+				   }
+	     
+	   }
+
+	   
 	
 	
 	   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
