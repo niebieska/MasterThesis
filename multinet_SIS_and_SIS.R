@@ -148,7 +148,14 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 	      numberOfRecovered = numberOfRecovered + length(new_recovered)
 	      SUM <- numberOfInfected + numberOfRecovered + numberOfSusceptible
 	      print(paste("Suma", SUM))
-	  # zapis stanów poœrednich 
+		  
+		  #Sprawdzenie stanu atrybutów - zawartoœæ wektora 
+		   SIR_attributes <- get_values_ml(fullnet,"state", advice)
+		  S<-length( which('S' == SIR_attributes))
+		  I<-length( which('I' == SIR_attributes))
+		  R <-length( which('R' == SIR_attributes))
+		  Sum = S+I+R
+		  	  # zapis stanów poœrednich 
 	 
 	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
      	  timeline_SIR <- cbind(timeline_SIR,lastStateSIR)
