@@ -1,6 +1,6 @@
 # biblioteka 
 library(multinet)
-
+load("C:/Users/Paulina/Documents/SIR_experiments/Repository/eksperymentfullnet/timeline_statesfullnet_SIR.dat")
 # definicja seed
 #set.seed(1313)
 
@@ -16,14 +16,18 @@ numberOfActorsInLayer <- num_actors_ml(fullnet,"advice")
 #czas trwania "epidemii" -  liczba dni
 time <- 20
 
-# prawdopodobieñstwa
+# prawdopodobieñstwa SIR
 beta <- 0.85 # zara¿enia
 gamma <- 0.03 # wyzdrowienia
 
+# prawdopodobieñstwa SIS
+epsilon <-0.1 # odpowiednik beta, uzuskania informacji
+mi <- 0.2    # zwatpienia
 #Stan SIR
 numberOfSusceptible <- numberOfActorsInLayer
 numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
+SUM<- numberOfSusceptible + numberOfInfected + numberOfRecovered 
 
 # Stan pocz¹tkowy dla macierzy licznoœci 
 SIR_group_States <- matrix(rbind(0,numberOfSusceptible,numberOfInfected,numberOfRecovered, SUM))
@@ -34,22 +38,22 @@ new_recovered <-NULL # nowe ozdrowienia
 
 #dodanie atrybutów (state -stan dla SIR, SIRbeta - prawdopodobieñstwo)
 add_attributes_ml(fullnet, "state", type = "string", target="actor", layer ="")
-add_attributes_ml(fullnet, "SIR_beta", type = "numeric", target = "actor", layer = "")
-add_attributes_ml(fullnet, "awareness", type ="string", target ="actor", layer = "")
 add_attributes_ml(fullnet, "beta", type = "numeric", target = "actor", layer = "")
+add_attributes_ml(fullnet, "awareness", type ="string", target ="actor", layer = "")
+add_attributes_ml(fullnet, "epsilon", type = "numeric", target = "actor", layer = "")
 
 
 #ustawienie wartoœci atrybutu state dla SIR domyœlnie na S
 set_values_ml(fullnet, "state",actors_ml(fullnet,"advice"), values ="S" )
 set_values_ml(fullnet, "awareness",actors_ml(fullnet), values ="S" )
-set_values_ml(fullnet, "SIR_beta",actors_ml(fullnet), values = beta)
 set_values_ml(fullnet, "beta",actors_ml(fullnet), values = beta)
+set_values_ml(fullnet, "epsilon",actors_ml(fullnet), values = epsilon)
 
 #sprawdzenie ustawionych wartoœci 
 #get_values_ml(fullnet,"state",actors_ml(fullnet))
 #get_values_ml(fullnet,"awareness",actors_ml(fullnet))
+#get_values_ml(fullnet,"epsilon",actors_ml(fullnet))
 #get_values_ml(fullnet,"beta",actors_ml(fullnet))
-#get_values_ml(fullnet,"SIR_beta",actors_ml(fullnet))
 
 advice<-actors_ml(fullnet,"advice")
 
@@ -84,7 +88,7 @@ while (n>0)
 
 
 timeline_SIR<- as.matrix( actors_ml(fullnet,"advice"))
-timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"advice")))
+timeline_SIR= cbind(timeline_SIR, get_values_ml(fullnet,"state",actors_ml(fullnet,"advice")))
 
 #dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
  #dodatkowy warunek na wyjœcie jak wszyscy s¹ w R
@@ -150,11 +154,11 @@ timeline_SIR= cbind(timeline, get_values_ml(fullnet,"state",actors_ml(fullnet,"a
 	      print(paste("Suma", SUM))
 		  
 		  #Sprawdzenie stanu atrybutów - zawartoœæ wektora 
-		   SIR_attributes <- get_values_ml(fullnet,"state", advice)
-		  S<-length( which('S' == SIR_attributes))
-		  I<-length( which('I' == SIR_attributes))
-		  R <-length( which('R' == SIR_attributes))
-		  Sum = S+I+R
+		    SIR_attributes <- get_values_ml(fullnet,"state", advice)
+		    S<-length( which('S' == SIR_attributes))
+		    I<-length( which('I' == SIR_attributes))
+		    R <-length( which('R' == SIR_attributes))
+		    Sum = S+I+R
 		  	  # zapis stanów poœrednich 
 	 
 	      lastStateSIR <- get_values_ml(fullnet,"state",actors_ml(fullnet,"advice"))
@@ -172,6 +176,9 @@ directory <- paste("eksperyment",experimentFolder, sep="")
 
 #folder dla eksperymentów 
 dir.create(directory)
+# zapis do pliku dat.
+write.table(SIR_group_States,file=paste(directory,paste("/Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
 
 # Zapis poszczególnych stanów SIR do pliku CSV
 write.csv(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
