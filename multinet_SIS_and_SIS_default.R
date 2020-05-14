@@ -39,9 +39,11 @@ SIR_Sum<- numberOfSusceptible + numberOfInfected + numberOfRecovered
 numberOfUnawarened <-numberOfActors
 numberOfAwarened <- 0
 SIS_Sum <- numberOfAwarened + numberOfUnawarened
-# Stan pocz¹tkowy dla macierzy licznoœci 
+ 
+ # Stan pocz¹tkowy dla macierzy licznoœci 
 SIR_group_States <- matrix(rbind(0,numberOfSusceptible, numberOfInfected, numberOfRecovered, SIR_Sum))
 SIS_group_States <- matrix (rbind(0, numberOfUnawarened, numberOfAwarened, SIS_Sum))
+
 # zmienne pomocnicze
 new_infected <- NULL # nowe zachorowania
 new_recovered <- NULL # nowe ozdrowienia
