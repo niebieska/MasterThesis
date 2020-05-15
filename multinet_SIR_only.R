@@ -1,3 +1,5 @@
+# biblioteka 
+library(multinet)
 
 # SIR only file - for exsperiments without SIS ----------------------------
 # FolderRoboczy 
@@ -13,19 +15,16 @@ dir.create(directory)
 setwd(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""))
 
 
-# biblioteka 
-library(multinet)
-
+experimentNumber <- 20
 # definicja seed #set.seed(1313)
-
-# wczytanie sieci 
-#net <- read_ml("C:/Users/Paulina/Desktop/Repository/Fullnet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
-#net<- read_ml ("experiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
+for(e in 1:experimentNumber)
+{ 
+   # wczytanie sieci 
 net <- ml_aucs()
-layers_ml(net)
 
+fileConn <- file(paste(paste(e,"AUCS", sep=""),"Data.txt",sep =""))
 layerName <- "work"
-
+writeLines(c(layerName,"\n"),fileConn)
 #parametry sieci
 numberOfActors <- num_actors_ml(net)
 numberOfActorsInLayer <- num_actors_ml(net,layerName)
@@ -37,12 +36,10 @@ networkActors <- actors_ml(net)
 time <- 150
 
 # prawdopodobieñstwa SIR
-beta <- 0.05 # zara¿enia
-gamma <- 0.03 # wyzdrowienia
-
-# prawdopodobieñstwa SIS
-epsilon <-0.1 # odpowiednik beta, uzuskania informacji
-mi <- 0.2    # zwatpienia
+beta <- 0.19 # zara¿enia
+gamma <- 0.1 # wyzdrowienia
+writeLines(paste(paste("beta:",beta),paste("gamma:",gamma)),fileConn)
+close(fileConn)
 
 #Stan SIR
 numberOfSusceptible <- numberOfActorsInLayer
@@ -50,34 +47,20 @@ numberOfInfected  <- 0 #
 numberOfRecovered <- 0 # ozdrowieñcy
 SIR_Sum<- numberOfSusceptible + numberOfInfected + numberOfRecovered 
 
-#Stan SIS
-numberOfUnawarened <-numberOfActors
-numberOfAwarened <- 0
-SIS_Sum <- numberOfAwarened + numberOfUnawarened
- 
+
  # Stan pocz¹tkowy dla macierzy licznoœci 
-SIR_group_States <- matrix(rbind(0,numberOfSusceptible, numberOfInfected, numberOfRecovered, SIR_Sum))
-SIS_group_States <- matrix (rbind(0, numberOfUnawarened, numberOfAwarened, SIS_Sum))
+SIR_group_States <- matrix(cbind(0,numberOfSusceptible, numberOfInfected, numberOfRecovered, SIR_Sum))
+
 
 # zmienne pomocnicze
 new_infected <- NULL # nowe zachorowania
 new_recovered <- NULL # nowe ozdrowienia
 
-new_awarened <- NULL # œwiadomi S
-new_unawarened <- NULL # nieœwiadomi versus wypieraj¹cy
-
-#dodanie atrybutów (state -stan dla SIR, SIRbeta - prawdopodobieñstwo)
+#dodanie atrybutów (state -stan dla SIR,)
 add_attributes_ml(net, "state", type = "string", target="actor", layer ="")
-add_attributes_ml(net, "beta", type = "numeric", target = "actor", layer = "")
-add_attributes_ml(net, "awareness", type ="string", target ="actor", layer = "")
-add_attributes_ml(net, "epsilon", type = "numeric", target = "actor", layer = "")
-
 
 #ustawienie wartoœci atrybutu state dla SIR domyœlnie na S
 set_values_ml(net, "state",actors_ml(net,layerName), values ="S" )
-set_values_ml(net, "awareness",actors_ml(net), values ="S" )
-set_values_ml(net, "beta",actors_ml(net), values = beta)
-set_values_ml(net, "epsilon",actors_ml(net), values = epsilon)
 
 #sprawdzenie ustawionych wartoœci 
 #get_values_ml(net,"state",actors_ml(net))
@@ -114,28 +97,9 @@ while (n>0)
   n=n-1
 }
 
-#uœwiadomienie wybranych osób 
-x<-0.10
-m<- round( x * num_actors_ml(net)) # x % aktorów z ca³ej sieci
-awarened <- trunc(runif(m,1,numberOfActorsInLayer))
-
-# Aktualizowanie stanu SIS
-numberOfAwarened <- m
-numberOfUnawarened <- numberOfUnawarened - numberOfAwarened
-
-while (m>0)
-{ print( paste("uœwiadamianie w toku - aktor :", awarened[m]))
-  set_values_ml(net, "awareness", networkActors[awarened[m]], values ="I" )
-  #print(paste(m, get_values_ml(net, "awareness",awarened[m]))) do sprawdzenia 
-  m=m-1
-  
-}
-
-
 timeline_SIR<- as.matrix(layerActors)
 timeline_SIR = cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
-timeline_SIS <- as.matrix(networkActors)
-timeline_SIS <- cbind(timeline_SIS, get_values_ml(net,"awareness",networkActors))
+
 
 for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
 {  
@@ -182,39 +146,7 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
     }
     
   }
-  
-  print( paste("Stan SIS:", paste( paste( paste("Susceptible:", numberOfUnawarened),paste("Infected:", numberOfAwarened), sep = " ; "))))
-  SIS_group_States <- cbind(SIS_group_States,rbind(i,numberOfUnawarened,numberOfAwarened, SIS_Sum))
-  #Pêtla dla SIS
-  for(k in 1: length(networkActors))
-  {
-    if(get_values_ml(net,"state",networkActors[k]) =="I")
-    {
-      # poszukiwanie s¹siadów
-      actorNeighbors <- neighbors_ml(net,networkActors[k],layerName,mode="all")
-      for(l in 1:length(actorNeighbors))
-      {  
-        if(get_values_ml(net, "state", actorNeighbors[l])=="S")
-        { 
-          if( runif(1) < epsilon) 
-          { #print( value)
-            if(!(actorNeighbors[l] %in% new_awarened)) # is.element(neighbors[s])
-              new_awarened <- cbind(new_awarened,actorNeighbors[l]) # mamy tymczasow¹ listê nowo zainfekowanych  							
-          }
-        }		   
-      }
-      if( runif(1) < mi)
-      { #print(test)
-        if(!is.element(networkActors[k],new_unawarened)){ new_unawarened=cbind(new_unawarened,networkActors[k])}
-        
-      }
-    }
-    
-  }
-  
-  
-  
-  
+ 
   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
   if(!is.null(new_infected))  set_values_ml(net, "state",new_infected, values ="I" )
   if(!is.null(new_recovered))  set_values_ml(net, "state",new_recovered, values ="R" )
@@ -222,16 +154,6 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
   #print (paste("new R", length(new_recovered)))
   #print(paste("new I", length(new_infected)))
   
-  #aktualizacja SIS    
-  if(!is.null(new_awarened))  set_values_ml(net, "awareness",new_awarened, values ="I" )
-  if(!is.null(new_unawarened))  set_values_ml(net, "awareness",new_unawarened, values ="S" )
-  
-  # 	  # Obliczenia stan SIR
-  # 	    numberOfSusceptible = numberOfSusceptible - length(new_infected)
-  #       numberOfInfected = numberOfInfected +(length(new_infected) - length(new_recovered))
-  #       numberOfRecovered = numberOfRecovered + length(new_recovered)
-  #       SUM <- numberOfInfected + numberOfRecovered + numberOfSusceptible
-  #       print(paste("Suma", SUM))
   
   #Sprawdzenie stanu atrybutów - zawartoœæ wektora 
   SIR_attributes <- get_values_ml(net,"state", layerActors)
@@ -240,37 +162,36 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
   numberOfRecovered <- length( which('R' == SIR_attributes))
   Sum = numberOfSusceptible + numberOfInfected + numberOfRecovered
   
-  SIS_atributes <- get_values_ml(net, "awareness", networkActors)  
-  numberOfUnawarened <- length(which("S"==SIS_atributes))
-  numberOfAwarened <- length(which("I"== SIS_atributes))
-  SIS_Sum <- numberOfAwarened + numberOfUnawarened 
-  # zapis stanów poœrednich 
+    # zapis stanów poœrednich 
   
   #lastStateSIR <- get_values_ml(net,"state",actors_ml(net,layerName))
   timeline_SIR <- cbind(timeline_SIR, SIR_attributes)
-  timeline_SIS <- cbind(timeline_SIS, SIS_atributes)
-}
 
+}
+SIR_group_States <- t(SIR_group_States)
 # Operacje IO - zapis, katalog roboczy -------------------------------------
-setwd("C:/Users/Paulina/Desktop/Repository")
-getwd()
+
 
 #zmienne pomocniecze do zapisu
-experimentFolder<- "net"
-experimentDescription <- "net_SIR"
-directory <- paste("eksperyment",experimentFolder, sep="")
+
+experimentDescription <- paste(e,"Poland_AUCS", sep ="-")
+#seconddirectory <- paste("experiment_AUCS",e, sep="")
+#dir.create(seconddirectory)
 
 #folder dla eksperymentów 
-dir.create(directory)
+setwd(paste(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""),seconddirectory, sep= "/"))
+
 # zapis do pliku dat.
-write.table(SIR_group_States,file=paste(directory,paste("/Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-write.table(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(SIR_group_States,file=paste(seconddirectory,paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
 
 # Zapis poszczególnych stanów SIR do pliku CSV
-write.csv(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
+write.csv(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
 
 # Zapis poszczególnych stanów SIR do pliku RDS
-saveRDS(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
+saveRDS(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
 
 # zapis zmodyfikowanej sieci do pliku - niepe³ny 
 #write_ml(net,file="experiment_Data/net_test.mpx",format="multilayer" )
+
+}
