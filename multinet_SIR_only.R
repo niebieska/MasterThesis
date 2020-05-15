@@ -7,13 +7,12 @@ setwd("C:/Users/Paulina/Desktop/Repository")
 getwd()
 
 #zmienne pomocniecze do zapisu
-experimentFolder<- "OnlySIR"
+experimentFolder<- "OnlySIR_AUCS"
 #experimentDescription <- "net_SIR"
 directory <- paste("experiments",experimentFolder, sep="")
 #folder dla eksperymentów 
 dir.create(directory)
 setwd(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""))
-
 
 experimentNumber <- 20
 # definicja seed #set.seed(1313)
@@ -23,8 +22,8 @@ for(e in 1:experimentNumber)
 net <- ml_aucs()
 
 fileConn <- file(paste(paste(e,"AUCS", sep=""),"Data.txt",sep =""))
-layerName <- "work"
-writeLines(c(layerName,"\n"),fileConn)
+layerName <- "lunch"
+#writeLines(c(layerName,"\n"),fileConn)
 #parametry sieci
 numberOfActors <- num_actors_ml(net)
 numberOfActorsInLayer <- num_actors_ml(net,layerName)
@@ -38,7 +37,8 @@ time <- 150
 # prawdopodobieñstwa SIR
 beta <- 0.19 # zara¿enia
 gamma <- 0.1 # wyzdrowienia
-writeLines(paste(paste("beta:",beta),paste("gamma:",gamma)),fileConn)
+probabilities <- paste(paste("beta:",beta),paste("gamma:",gamma))
+writeLines(paste(probabilities, layerName),fileConn)
 close(fileConn)
 
 #Stan SIR
@@ -106,6 +106,8 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
   
   # wypisuje - Stan SIR na konsole 
   SIR_group_States <- cbind(SIR_group_States,rbind(i,numberOfSusceptible,numberOfInfected,numberOfRecovered, SIR_Sum))
+  #writeLines(paste(paste(paste("Dzieñ epidemii:", i),paste("Stan SIR:", paste( paste( paste("Susceptible:", numberOfSusceptible),paste("Infected:", numberOfInfected), sep = " ; "),paste("Recovered:", numberOfRecovered),sep =" ; ")) ),"\n"),fileConn)
+  #writeLines("\n", fileConn)
   print(paste("Dzieñ epidemii:", i)) 
   print(paste("Stan SIR:", paste( paste( paste("Susceptible:", numberOfSusceptible),paste("Infected:", numberOfInfected), sep = " ; "),paste("Recovered:", numberOfRecovered),sep =" ; ")))
   
@@ -168,18 +170,19 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
   timeline_SIR <- cbind(timeline_SIR, SIR_attributes)
 
 }
+
 SIR_group_States <- t(SIR_group_States)
 # Operacje IO - zapis, katalog roboczy -------------------------------------
 
 
 #zmienne pomocniecze do zapisu
 
-experimentDescription <- paste(e,"Poland_AUCS", sep ="-")
-#seconddirectory <- paste("experiment_AUCS",e, sep="")
+experimentDescription <- paste(beta,"_Poland_AUCS", sep ="-")
+seconddirectory <- paste("_experiment_AUCS",e, sep="")
 #dir.create(seconddirectory)
 
 #folder dla eksperymentów 
-setwd(paste(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""),seconddirectory, sep= "/"))
+#setwd(paste(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""),seconddirectory, sep= "/"))
 
 # zapis do pliku dat.
 write.table(SIR_group_States,file=paste(seconddirectory,paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
@@ -189,8 +192,8 @@ write.table(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(pas
 write.csv(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
 
 # Zapis poszczególnych stanów SIR do pliku RDS
-saveRDS(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
-
+#saveRDS(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
+save(list = ls(all.names = TRUE), file =paste( seconddirectory,".RData",sep=""), envir = .GlobalEnv)
 # zapis zmodyfikowanej sieci do pliku - niepe³ny 
 #write_ml(net,file="experiment_Data/net_test.mpx",format="multilayer" )
 
