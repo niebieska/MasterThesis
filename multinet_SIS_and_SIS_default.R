@@ -1,7 +1,21 @@
 # biblioteka 
 library(multinet)
 
-# definicja seed #set.seed(1313)
+
+# Parametry eksperymentu  -------------------------------------------------
+
+# Folder roboczy
+setwd("C:/Users/Paulina/Documents/SIR_experiments/")
+getwd()
+#zmienne pomocniecze do zapisu
+experimentFolder<- "SIR&SIS_AUCS"
+dir.create(experimentFolder) 
+directory <- "ModelForPoland"
+#folder dla eksperymentów 
+setwd(paste("C:/Users/Paulina/Documents/SIR_experiments/", experimentFolder, sep=""))
+dir.create(directory)
+setwd(paste(paste("C:/Users/Paulina/Documents/SIR_experiments/",experimentFolder,sep=""), directory,sep="/"))
+getwd()
 
 # wczytanie sieci 
 #net <- read_ml("C:/Users/Paulina/Desktop/Repository/Fullnet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
