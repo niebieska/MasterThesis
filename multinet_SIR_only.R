@@ -7,7 +7,7 @@ setwd("C:/Users/Paulina/Desktop/Repository")
 getwd()
 
 #zmienne pomocniecze do zapisu
-experimentFolder<- "OnlySIR_AUCS"
+experimentFolder<- "OnlySIR_tailorshop"
 #experimentDescription <- "net_SIR"
 directory <- paste("experiments",experimentFolder, sep="")
 #folder dla eksperymentów 
@@ -19,10 +19,11 @@ experimentNumber <- 20
 for(e in 1:experimentNumber)
 { 
    # wczytanie sieci 
-net <- ml_aucs()
-
+net <- ml_monastery()
+layers_ml(net)
+#layers_ml(net)
 fileConn <- file(paste(paste(e,"AUCS", sep=""),"Data.txt",sep =""))
-layerName <- "lunch"
+layerName <- "leisure"
 #writeLines(c(layerName,"\n"),fileConn)
 #parametry sieci
 numberOfActors <- num_actors_ml(net)
@@ -81,7 +82,7 @@ set_values_ml(net, "state",actors_ml(net,layerName), values ="S" )
 # }
 
 # (B)losowo x % sieci - preferowane np 1% - liczymi ile to aktorów w sieci a potem losujemy tylu aktorów jako seedy
-x<-0.01
+x<-0.02
 n<- round( x * num_actors_ml(net,layerName)) # dla warstwy x % aktorów z wybranej warstwy
 infected <- trunc(runif(n,1,numberOfActorsInLayer))
 
