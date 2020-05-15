@@ -4,13 +4,13 @@ library(multinet)
 
 # Parametry eksperymentu  -------------------------------------------------
 
-# Folder roboczy
-setwd("C:/Users/Paulina/Documents/SIR_experiments/")
-getwd()
-#zmienne pomocniecze do zapisu
-experimentFolder<- "SIR&SIS_AUCS"
-dir.create(experimentFolder) 
-directory <- "ModelForPoland"
+# # Folder roboczy
+# setwd("C:/Users/Paulina/Documents/SIR_experiments/")
+# getwd()
+# #zmienne pomocniecze do zapisu
+# experimentFolder<- "SIR&SIS_AUCS"
+# dir.create(experimentFolder) 
+directory <- "ModelForPoland-150"
 #folder dla eksperymentów 
 setwd(paste("C:/Users/Paulina/Documents/SIR_experiments/", experimentFolder, sep=""))
 dir.create(directory)
@@ -38,7 +38,7 @@ networkActors <- actors_ml(net)
 
 # definicje zmiennych
 #czas trwania "epidemii" -  liczba dni
-time <- 20
+time <- 150
 
 # prawdopodobieñstwa SIR
 beta <- 0.31 # zara¿enia
@@ -281,47 +281,17 @@ SIS_group_States <- t(SIS_group_States)
 #zmienne pomocniecze do zapisu
 
 experimentDescription <- paste(paste(e,"eksperyment",sep="_"))
-seconddirectory <- ""
-
 
 #folder dla eksperymentów 
 #setwd(paste(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""),seconddirectory, sep= "/"))
 
 # zapis do pliku dat.
-write.table(SIR_group_States,file=paste(seconddirectory,paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-write.table(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(SIR_group_States,file=paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(timeline_SIR,file=paste("timeline_states_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(SIS_group_States,file=paste("Summary_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(timeline_SIS,file=paste("timeline_states_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
 
-# Zapis poszczególnych stanów SIR do pliku CSV
-write.csv(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
-
-# Zapis poszczególnych stanów SIR do pliku RDS
-#saveRDS(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
 save(list = ls(all.names = TRUE), file =paste( experimentDescription,".RData",sep=""), envir = .GlobalEnv)
-# zapis zmodyfikowanej sieci do pliku - niepe³ny 
-#write_ml(net,file="experiment_Data/net_test.mpx",format="multilayer" )
 
 
 }
-# # Operacje IO - zapis, katalog roboczy -------------------------------------
-# setwd("C:/Users/Paulina/Desktop/Repository")
-# getwd()
-# 
-# #zmienne pomocniecze do zapisu
-# experimentFolder<- "net"
-# experimentDescription <- "net_SIR"
-# directory <- paste("eksperyment",experimentFolder, sep="")
-# 
-# #folder dla eksperymentów 
-# dir.create(directory)
-# # zapis do pliku dat.
-# write.table(SIR_group_States,file=paste(directory,paste("/Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-# write.table(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-# 
-# # Zapis poszczególnych stanów SIR do pliku CSV
-# write.csv(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
-# 
-# # Zapis poszczególnych stanów SIR do pliku RDS
-# saveRDS(timeline_SIR,file=paste(directory,paste("/timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
-# 
-# # zapis zmodyfikowanej sieci do pliku - niepe³ny 
-# #write_ml(net,file="experiment_Data/net_test.mpx",format="multilayer" )
