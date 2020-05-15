@@ -164,7 +164,10 @@ timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 	   
 	      print( paste("Stan SIS:", paste( paste( paste("Susceptible:", numberOfUnawarened),paste("Infected:", numberOfAwarened), sep = " ; "))))
 	      SIS_group_States <- cbind(SIS_group_States,rbind(i,numberOfUnawarened,numberOfAwarened, SIS_Sum))
-	   #Pêtla dla SIS
+	      
+	      new_awarened <- NULL # œwiadomi S
+	      new_unawarened <- NULL # nieœwiadomi versus wypieraj¹cy
+	      #Pêtla dla SIS
 			   for(k in 1: length(actors))
 			   {
 				 if(get_values_ml(fullnet,"state",actors[k]) =="I")
@@ -173,7 +176,7 @@ timeline_SIS <- cbind(timeline_SIS, get_values_ml(fullnet,"awareness",actors))
 				   actorNeighbors <- neighbors_ml(fullnet,actors[k],"advice",mode="all")
 				   for(l in 1:length(actorNeighbors))
 				   {  
-					 if(get_values_ml(fullnet, "state", actorNeighbors[l])=="S")
+					 if(get_values_ml(fullnet, "awareness", actorNeighbors[l])=="S")
 				   { 
 					 if( runif(1) < epsilon) 
 					 { #print( value)
