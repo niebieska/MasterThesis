@@ -17,11 +17,14 @@ dir.create(directory)
 setwd(paste(paste("C:/Users/Paulina/Documents/SIR_experiments/",experimentFolder,sep=""), directory,sep="/"))
 getwd()
 
+experimentsNumber <- 20
+
 # wczytanie sieci 
 #net <- read_ml("C:/Users/Paulina/Desktop/Repository/Fullnet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
 #net<- read_ml ("experiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
+for(e in 1: experimentsNumber)
+{
 net <- ml_aucs()
-
 AllLayers <- layers_ml(net)
 
 # aktualna warstwa
@@ -233,7 +236,6 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
   
   
   
-  
   # aktualizacja nowych zaka¿eñ i ozdrowienia jeœli siê pojawi³y
   if(!is.null(new_infected))  set_values_ml(net, "state",new_infected, values ="I" )
   if(!is.null(new_recovered))  set_values_ml(net, "state",new_recovered, values ="R" )
@@ -271,9 +273,35 @@ for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ
 }
 SIR_group_States <- t(SIR_group_States)
 SIS_group_States <- t(SIS_group_States)
-get_values_ml(net,"beta",actors_ml(net))
-get_values_ml(net,"epsilon",actors_ml(net))
+#get_values_ml(net,"beta",actors_ml(net))
+#get_values_ml(net,"epsilon",actors_ml(net))
 
+# zapis wyników z e-tej iteracji  -----------------------------------------
+
+#zmienne pomocniecze do zapisu
+
+experimentDescription <- paste(paste(e,"eksperyment",sep="_"))
+seconddirectory <- ""
+
+
+#folder dla eksperymentów 
+#setwd(paste(paste("C:/Users/Paulina/Desktop/Repository/", directory,sep=""),seconddirectory, sep= "/"))
+
+# zapis do pliku dat.
+write.table(SIR_group_States,file=paste(seconddirectory,paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+write.table(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".dat", sep = "")), sep=""),sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+
+# Zapis poszczególnych stanów SIR do pliku CSV
+write.csv(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".csv", sep = "")), sep=""),sep=""), row.names = TRUE)
+
+# Zapis poszczególnych stanów SIR do pliku RDS
+#saveRDS(timeline_SIR,file=paste(seconddirectory,paste("timeline_states",(paste(experimentDescription,".rds", sep = "")), sep=""),sep=""))
+save(list = ls(all.names = TRUE), file =paste( experimentDescription,".RData",sep=""), envir = .GlobalEnv)
+# zapis zmodyfikowanej sieci do pliku - niepe³ny 
+#write_ml(net,file="experiment_Data/net_test.mpx",format="multilayer" )
+
+
+}
 # # Operacje IO - zapis, katalog roboczy -------------------------------------
 # setwd("C:/Users/Paulina/Desktop/Repository")
 # getwd()
