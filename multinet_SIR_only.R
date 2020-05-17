@@ -97,7 +97,7 @@ for(e in 1:experimentNumber)
 	}
 
 	timeline_SIR<- as.matrix(layerActors)
-	timeline_SIR = cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
+	timeline_SIR<-cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
 
 
 	for(i in 1:time ) # odliczamy kolejne dni 1 iteracja - 1 dzieñ

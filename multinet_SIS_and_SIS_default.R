@@ -137,8 +137,8 @@ for(e in 1: experimentsNumber)
 	}
 
 
-	timeline_SIR<- as.matrix(layerActors)
-	timeline_SIR = cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
+	timeline_SIR <- as.matrix(layerActors)
+	timeline_SIR <- cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
 	timeline_SIS <- as.matrix(networkActors)
 	timeline_SIS <- cbind(timeline_SIS, get_values_ml(net,"awareness",networkActors))
 
