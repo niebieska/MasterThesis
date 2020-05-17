@@ -8,7 +8,8 @@ library(multinet)
 setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 # #zmienne pomocniecze do zapisu
-experimentFolder<- "SIR&SIS_LAZEGA"
+networkName <- "Lazega"
+experimentFolder<- paste("SIR&SIS",networkName, sep="_")
 #dir.create(experimentFolder) 
 directory <- "ModelForPoland-default"
 #folder dla eksperymentów 

@@ -7,7 +7,7 @@ setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 #zmienne pomocniecze do zapisu
 networkName <- "Lazega"
-experimentFolder<- paste("SIRonly",networkName, sep="_")
+experimentFolder<- paste("SIR&SIS",networkName, sep="_")
 dir.create(experimentFolder) 
 directory <- "ModelForPoland-SIRonly"
 #folder dla eksperymentów 
