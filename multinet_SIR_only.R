@@ -39,7 +39,7 @@ for(e in 1:experimentNumber)
 	time <- 150
 
 	# prawdopodobieñstwa SIR
-	beta <- 0.19 # zara¿enia
+	beta <- 0.31 # zara¿enia
 	gamma <- 0.1 # wyzdrowienia
 	probabilities <- paste(paste("beta:",beta),paste("gamma:",gamma))
 
@@ -162,7 +162,7 @@ for(e in 1:experimentNumber)
 	SIR_group_States <- t(SIR_group_States)
 
 	# zapis wyników z e-tej iteracji  -----------------------------------------
-	experimentDescription <- paste(paste(e,"eksperyment",sep="_"),paste(beta,epsilon, sep ="-")
+	experimentDescription <- paste(paste(paste(e,"eksperyment",sep="_"),beta, sep ="-"))
 
 	# zapis do pliku dat.
 	write.table(SIR_group_States,file=paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )

@@ -48,7 +48,7 @@ for(e in 1: experimentsNumber)
 
 	# prawdopodobieñstwa SIS
 	epsilon <-0.31 # odpowiednik beta, uzuskania informacji
-	epsilonI <-0.7 # jeœli SIR w stanie I
+	epsilonI <-0.692 # jeœli SIR w stanie I Japan  0.692 lub DiamonPrincess 0.821 
 	mi <- 0.1    # zwatpienia
 
 	#Stan SIR
@@ -264,7 +264,7 @@ for(e in 1: experimentsNumber)
 	# zapis wyników z e-tej iteracji  -----------------------------------------
 
 	#zmienne pomocniecze do zapisu
-	experimentDescription <- paste(paste(e,"eksperyment",sep="_"),paste(beta,epsilon, sep ="-")
+	experimentDescription <- paste(paste(e,"eksperyment",sep="_"),paste(beta,epsilon, sep ="-"))
 	#folder dla eksperymentów 
 
 	# zapis do pliku dat.
