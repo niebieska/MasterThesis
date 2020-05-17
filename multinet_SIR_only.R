@@ -3,7 +3,7 @@ library(multinet)
 
 # Parametry zapisu eksperymentu  -------------------------------------------------
 # # Folder roboczy
-setwd("C:/Users/Paulina/Documents/SIR_experiments/")
+setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 #zmienne pomocniecze do zapisu
 networkName <- "Lazega"
@@ -11,9 +11,9 @@ experimentFolder<- paste("SIRonly",networkName, sep="_")
 dir.create(experimentFolder) 
 directory <- "ModelForPoland-SIRonly"
 #folder dla eksperymentów 
-setwd(paste("C:/Users/Paulina/Documents/SIR_experiments/", experimentFolder, sep=""))
+setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentFolder, sep=""))
 dir.create(directory)
-setwd(paste(paste("C:/Users/Paulina/Documents/SIR_experiments/",experimentFolder,sep=""), directory,sep="/"))
+setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentFolder,sep=""), directory,sep="/"))
 getwd()
 
 experimentNumber <- 20

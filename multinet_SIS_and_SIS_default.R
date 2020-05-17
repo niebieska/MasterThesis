@@ -5,16 +5,16 @@ library(multinet)
 # Parametry eksperymentu  -------------------------------------------------
 
 # # Folder roboczy
-setwd("C:/Users/Paulina/Documents/SIR_experiments/")
+setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 # #zmienne pomocniecze do zapisu
 experimentFolder<- "SIR&SIS_LAZEGA"
 #dir.create(experimentFolder) 
 directory <- "ModelForPoland-default"
 #folder dla eksperymentów 
-setwd(paste("C:/Users/Paulina/Documents/SIR_experiments/", experimentFolder, sep=""))
+setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentFolder, sep=""))
 dir.create(directory)
-setwd(paste(paste("C:/Users/Paulina/Documents/SIR_experiments/",experimentFolder,sep=""), directory,sep="/"))
+setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentFolder,sep=""), directory,sep="/"))
 getwd()
 
 experimentsNumber <- 20
@@ -135,7 +135,6 @@ for(e in 1: experimentsNumber)
 	  m=m-1
 	  
 	}
-
 
 	timeline_SIR <- as.matrix(layerActors)
 	timeline_SIR <- cbind(timeline_SIR, get_values_ml(net,"state", layerActors ))
