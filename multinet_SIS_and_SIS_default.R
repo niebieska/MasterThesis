@@ -1,36 +1,46 @@
 # biblioteka 
 library(multinet)
 
+listBeta <- c(0.19,0.28,0.22)
+listgamma <-c(0.1,0.08,0.02)
+networkName <- "CKM"
+countryDirectory <-"Italy"
+scritpType<-"SIS&SIR_default"
 
-# Parametry eksperymentu  -------------------------------------------------
-
-# # Folder roboczy
-setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
-getwd()
-# #zmienne pomocniecze do zapisu
-networkName <- "Lazega"
-experimentFolder<- paste("SIR&SIS",networkName, sep="_")
-#dir.create(experimentFolder) 
-directory <- "ModelForPoland-default"
-#folder dla eksperymentów 
-setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentFolder, sep=""))
-dir.create(directory)
-setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentFolder,sep=""), directory,sep="/"))
-getwd()
+for(value in 1:length(listBeta))
+{
+  if(value == 1){
+    
+    # Parametry zapisu eksperymentu  -------------------------------------------------
+    # # Folder roboczy
+    setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
+    getwd()
+    #zmienne pomocniecze do zapisu
+    experimentsMainDirectory<- paste("SIR&SIS",networkName, sep="-")
+    if(dir.exists(experimentsMainDirectory) == FALSE) dir.create(experimentsMainDirectory)
+    #folder dla eksperymentów 
+    setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentsMainDirectory, sep=""))
+    if(dir.exists(countryDirectory) == FALSE) dir.create(countryDirectory)
+    setwd(paste(getwd(), countryDirectory,sep="/"))
+  }
+  setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentsMainDirectory,sep=""),countryDirectory,sep="/"))  
+  mainDirectory <-paste(listBeta[value],listgamma[value], sep = "-")
+  if(dir.exists(mainDirectory) == FALSE) dir.create(mainDirectory)
+  setwd(paste(getwd(),mainDirectory, sep="/") )
+  if(dir.exists(scritpType) == FALSE) dir.create(scritpType)
+  setwd(paste(getwd(),scritpType, sep="/") )
+  getwd()
 
 experimentsNumber <- 20
 
-# wczytanie sieci 
-#net <- read_ml("C:/Users/Paulina/Desktop/Repository/Fullnet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
-#net<- read_ml ("experiment_Data/net_test.mpx","test",sep=',', aligned=FALSE)
 for(e in 1: experimentsNumber)
 {
 	#net <- ml_aucs()
-	net <- fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/Lazega-Law-Firm_4NoNatureNoLoops.edges", name="Lazega", sep=',', aligned=FALSE)
+	net <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="Lazega", sep=',', aligned=FALSE)
 	AllLayers <- layers_ml(net)
 	  
 	# aktualna warstwa
-	layerName <- "co-work"
+	layerName <- "advice"
 
 	#parametry sieci
 	numberOfActors <- num_actors_ml(net)
@@ -38,19 +48,19 @@ for(e in 1: experimentsNumber)
 	layerActors <- actors_ml(net,layerName)
 	networkActors <- actors_ml(net)
 
-	# definicje zmiennych
+	# definicje zmiennych dla modeli
 	#czas trwania "epidemii" -  liczba dni
 	time <- 150
 
 	# prawdopodobieñstwa SIR
-	beta <- 0.31 # zara¿enia
+	beta <- listBeta[value] # zara¿enia
 	betaI <- beta /10 #jeœli SIS w stanie I  
-	gamma <- 0.1 # wyzdrowienia
+	gamma <- listgamma[value] # wyzdrowienia
 
 	# prawdopodobieñstwa SIS
-	epsilon <-0.31 # odpowiednik beta, uzuskania informacji
+	epsilon <-beta * 2 # odpowiednik beta, uzuskania informacji
 	epsilonI <-0.692 # jeœli SIR w stanie I Japan  0.692 lub DiamonPrincess 0.821 
-	mi <- 0.1    # zwatpienia
+	mi <- gamma * 2    # zwatpienia
 
 	#Stan SIR
 	numberOfSusceptible <- numberOfActorsInLayer
@@ -122,7 +132,7 @@ for(e in 1: experimentsNumber)
 	}
 
 	#uœwiadomienie wybranych osób 
-	x<-0.10
+	x<-0.01
 	m<- round( x * num_actors_ml(net)) # x % aktorów z ca³ej sieci
 	awarened <- trunc(runif(m,1,numberOfActorsInLayer))
 
@@ -263,19 +273,35 @@ for(e in 1: experimentsNumber)
 
 
 	# zapis wyników z e-tej iteracji  -----------------------------------------
-
-	#zmienne pomocniecze do zapisu
-	experimentDescription <- paste(paste(e,"eksperyment",sep="_"),paste(beta,epsilon, sep ="-"))
-	#folder dla eksperymentów 
-
+	experimentDescription <- paste("eksperymentData",e, sep="-")
+	
 	# zapis do pliku dat.
-	write.table(SIR_group_States,file=paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-	write.table(timeline_SIR,file=paste("timeline_states_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-	write.table(SIS_group_States,file=paste("Summary_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-	write.table(timeline_SIS,file=paste("timeline_states_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-
+	write.table(SIR_group_States,file=paste("Summary_SIR",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
+	write.table(timeline_SIR,file=paste("timelineStates_SIR",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
+	
+	# zapis do pliku dat.
+	write.table(SIS_group_States,file=paste("Summary_SIS",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
+	write.table(timeline_SIS,file=paste("timelineStates_SIS",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
+	
 	# zapis RData
 	save(list = ls(all.names = TRUE), file =paste( experimentDescription,".RData",sep=""), envir = .GlobalEnv)
+	
+	
+	# # zapis wyników z e-tej iteracji  -----------------------------------------
+	# 
+	# #zmienne pomocniecze do zapisu
+	# experimentDescription <- paste(paste(e,"eksperyment",sep="_"),paste(beta,epsilon, sep ="-"))
+	# #folder dla eksperymentów 
+	# 
+	# # zapis do pliku dat.
+	# write.table(SIR_group_States,file=paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+	# write.table(timeline_SIR,file=paste("timeline_states_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+	# write.table(SIS_group_States,file=paste("Summary_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+	# write.table(timeline_SIS,file=paste("timeline_states_SIS",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+	# 
+	# # zapis RData
+	# save(list = ls(all.names = TRUE), file =paste( experimentDescription,".RData",sep=""), envir = .GlobalEnv)
 
 
+}
 }

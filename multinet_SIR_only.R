@@ -1,7 +1,11 @@
 # biblioteka 
 library(multinet)
+
 listBeta <- c(0.19,0.28,0.22)
 listgamma <-c(0.1,0.08,0.02)
+networkName <- "CKM"
+countryDirectory <-"Italy"
+scritpType<-"SIR_only"
 for(value in 1:length(listBeta))
 {
 if(value == 1){
@@ -10,10 +14,7 @@ if(value == 1){
 setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 #zmienne pomocniecze do zapisu
-networkName <- "CKM"
-experimentsMainDirectory<- paste("SIR&SIS",networkName, sep="_")
-countryDirectory <-"Italy"
-scritpType<-"SIR_only"
+experimentsMainDirectory<- paste("SIR&SIS",networkName, sep="-")
 if(dir.exists(experimentsMainDirectory) == FALSE) dir.create(experimentsMainDirectory)
 #folder dla eksperymentów 
 setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentsMainDirectory, sep=""))
@@ -92,7 +93,7 @@ for(e in 1:experimentNumber)
 	# }
 
 	# (B)losowo x % sieci - preferowane np 1% - liczymi ile to aktorów w sieci a potem losujemy tylu aktorów jako seedy
-	x<-0.02
+	x<-0.01
 	n<- round( x * num_actors_ml(net,layerName)) # dla warstwy x % aktorów z wybranej warstwy
 	infected <- trunc(runif(n,1,numberOfActorsInLayer))
 
