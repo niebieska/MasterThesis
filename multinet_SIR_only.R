@@ -1,32 +1,44 @@
 # biblioteka 
 library(multinet)
-
+listBeta <- c(0.19,0.28,0.22)
+listgamma <-c(0.1,0.08,0.02)
+for(value in 1:length(listBeta))
+{
+if(value == 1){
 # Parametry zapisu eksperymentu  -------------------------------------------------
 # # Folder roboczy
 setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
 getwd()
 #zmienne pomocniecze do zapisu
-networkName <- "Lazega"
-experimentFolder<- paste("SIR&SIS",networkName, sep="_")
-dir.create(experimentFolder) 
-directory <- "ModelForPoland-SIRonly"
+networkName <- "CKM"
+experimentsMainDirectory<- paste("SIR&SIS",networkName, sep="_")
+countryDirectory <-"Italy"
+scritpType<-"SIR_only"
+if(dir.exists(experimentsMainDirectory) == FALSE) dir.create(experimentsMainDirectory)
 #folder dla eksperymentów 
-setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentFolder, sep=""))
-dir.create(directory)
-setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentFolder,sep=""), directory,sep="/"))
+setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentsMainDirectory, sep=""))
+if(dir.exists(countryDirectory) == FALSE) dir.create(countryDirectory)
+setwd(paste(getwd(), countryDirectory,sep="/"))
+}
+setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentsMainDirectory,sep=""),countryDirectory,sep="/"))  
+mainDirectory <-paste(listBeta[value],listgamma[value], sep = "-")
+if(dir.exists(mainDirectory) == FALSE) dir.create(mainDirectory)
+setwd(paste(getwd(),mainDirectory, sep="/") )
+if(dir.exists(scritpType) == FALSE) dir.create(scritpType)
+setwd(paste(getwd(),scritpType, sep="/") )
 getwd()
-
 experimentNumber <- 20
 
 for(e in 1:experimentNumber)
 { 
 	# wczytanie sieci 
 	#net <- ml_aucs()
-	net <- fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/Lazega-Law-Firm_4NoNatureNoLoops.edges", name="Lazega", sep=',', aligned=FALSE)
+	
+  net <-read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="EU", sep=',', aligned=FALSE)
 	AllLayers <- layers_ml(net)
-  
+	#read_ml("C:/Users/Paulina/Downloads/FullNet/CS-Aarhus_4NoNature.edges", name="CS", sep=' ', aligned=FALSE)
 	# aktualna warstwa
-	layerName <- "co-work"
+	layerName <- "advice"
 
 	#parametry sieci
 	numberOfActors <- num_actors_ml(net)
@@ -39,9 +51,9 @@ for(e in 1:experimentNumber)
 	time <- 150
 
 	# prawdopodobieñstwa SIR
-	beta <- 0.31 # zara¿enia
-	gamma <- 0.1 # wyzdrowienia
-	probabilities <- paste(paste("beta:",beta),paste("gamma:",gamma))
+	beta <- listBeta[value] # zara¿enia
+	gamma <- listgamma[value] # wyzdrowienia
+	#probabilities <- paste(paste("beta:",beta),paste("gamma:",gamma))
 
 	#Stan SIR
 	numberOfSusceptible <- numberOfActorsInLayer
@@ -153,8 +165,6 @@ for(e in 1:experimentNumber)
 	  Sum = numberOfSusceptible + numberOfInfected + numberOfRecovered
 	  
 		# zapis stanów poœrednich 
-	  
-	  #lastStateSIR <- get_values_ml(net,"state",actors_ml(net,layerName))
 	  timeline_SIR <- cbind(timeline_SIR, SIR_attributes)
 
 	}
@@ -162,12 +172,13 @@ for(e in 1:experimentNumber)
 	SIR_group_States <- t(SIR_group_States)
 
 	# zapis wyników z e-tej iteracji  -----------------------------------------
-	experimentDescription <- paste(paste(paste(e,"eksperyment",sep="_"),beta, sep ="-"))
+	experimentDescription <- paste("eksperymentData",e, sep="-")
 
 	# zapis do pliku dat.
-	write.table(SIR_group_States,file=paste("Summary_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
-	write.table(timeline_SIR,file=paste("timeline_states_SIR",(paste(experimentDescription,".dat", sep = "")), sep=""), col.names =TRUE, sep =";", row.names = TRUE )
+	write.table(SIR_group_States,file=paste("Summary_SIR",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
+	write.table(timeline_SIR,file=paste("timelineStates_SIR",(paste(e,".dat", sep = "")), sep="-"), col.names =TRUE, sep =";", row.names = TRUE )
 
 	# zapis RData
 	save(list = ls(all.names = TRUE), file =paste( experimentDescription,".RData",sep=""), envir = .GlobalEnv)
+}
 }
