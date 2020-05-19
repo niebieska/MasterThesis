@@ -4,7 +4,7 @@ library(multinet)
 listBeta <- c(0.19,0.28,0.22)
 listgamma <-c(0.1,0.08,0.02)
 
-networkName <- "CKM"
+networkName <- "Lazega"
 countryDirectory <-"Italy"
 scritpType<-"SIS&SIR_blocking"
 
@@ -38,11 +38,11 @@ experimentsNumber <- 20
 for(e in 1: experimentsNumber)
 {
 	#net <- ml_aucs()
-	net <- fullnet <- read_ml("C:/Users/Paulina/Downloads/FullNet/CKM-Physicians-Innovation_4NoNature.edges", name="CKM", sep=',', aligned=FALSE)
+  net <-read_ml("C:/Users/Paulina/Downloads/FullNet/Lazega-Law-Firm_4NoNatureNoLoops.edges", name="LAZEGA", sep=',', aligned=FALSE)
 	AllLayers <- layers_ml(net)
 
 	# aktualna warstwa
-	layerName <- "advice"
+	layerName <- "co-work"
 
 	#parametry sieci
 	numberOfActors <- num_actors_ml(net)
@@ -63,7 +63,7 @@ for(e in 1: experimentsNumber)
 	epsilon <- beta * 2 # odpowiednik beta, uzuskania informacji
 	epsilonI <- 0.692 # jeœli SIR w stanie I Japan  0.692 lub DiamonPrincess 0.821 
 	mi <- gamma * 2    # zwatpienia
-	
+	blockingTime <- 21
 
 	#Stan SIR
 	numberOfSusceptible <- numberOfActorsInLayer
