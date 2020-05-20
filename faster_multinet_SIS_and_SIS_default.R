@@ -178,6 +178,7 @@ for(e in 1: experimentsNumber)
 		#{ 
 		  # szukamy s¹siadów 
 		  neighbors <- neighbors_ml(net,layerActors[actualInfectedInLayer[j]],layerName,mode="all")
+		  if(length(neighbors)!= 0)
 		  for(s in 1:length(neighbors))
 		  {  if(get_values_ml(net, "state", neighbors[s])=="S")
 				{ 
@@ -221,7 +222,7 @@ for(e in 1: experimentsNumber)
 	  
 	  
 	  if(length(actualInfectedInNetwork) != 0)
-	  
+	 
 		  #Pêtla dla SIS
 		  for(k in 1: length(actualInfectedInNetwork))
 		  {
@@ -229,6 +230,7 @@ for(e in 1: experimentsNumber)
 			#{ 
 			  # poszukiwanie s¹siadów
 			  actorNeighbors <- neighbors_ml(net,networkActors[actualInfectedInNetwork[k]],layerName,mode="all")
+			  if(length(actorNeighbors)!= 0)
 			  for(l in 1:length(actorNeighbors))
 			  {  
 				if(get_values_ml(net, "awareness", actorNeighbors[l])=="S")
