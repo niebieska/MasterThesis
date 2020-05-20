@@ -223,12 +223,12 @@ for(e in 1: experimentsNumber)
 	  if(length(actualInfectedInNetwork) != 0)
 	  
 		  #Pêtla dla SIS
-		  for(k in 1: length(networkActors))
+		  for(k in 1: length(actualInfectedInNetwork))
 		  {
 			#if(get_values_ml(net,"state",networkActors[k]) =="I")
 			#{ 
 			  # poszukiwanie s¹siadów
-			  actorNeighbors <- neighbors_ml(net,networkActors[k],layerName,mode="all")
+			  actorNeighbors <- neighbors_ml(net,networkActors[actualInfectedInNetwork[k]],layerName,mode="all")
 			  for(l in 1:length(actorNeighbors))
 			  {  
 				if(get_values_ml(net, "awareness", actorNeighbors[l])=="S")
@@ -246,7 +246,7 @@ for(e in 1: experimentsNumber)
 			  }
 			  if( runif(1) < mi)
 			  { #print(test)
-				if(!is.element(networkActors[k],new_unawarened)){ new_unawarened=cbind(new_unawarened,networkActors[k])}
+				if(!is.element(networkActors[actualInfectedInNetwork[k]],new_unawarened)){ new_unawarened=cbind(new_unawarened,networkActors[actualInfectedInNetwork[k]])}
 				
 			  }
 			#}
