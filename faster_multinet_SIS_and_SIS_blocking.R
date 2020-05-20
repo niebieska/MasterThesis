@@ -8,7 +8,7 @@ networkName <- "MoscowAthletics2013"
 countryDirectory <-"Mno¿nikx2"
 scritpType<-"SIS&SIR_blocking"
 networkFileName <-"MoscowAthletics2013_4NoNatureNoLoops.edges"
-
+network<-read_ml(paste("C:/Users/Paulina/Downloads/FullNet/",networkFileName,sep=""), name=networkName, sep=',', aligned=FALSE)
 layerName <- "RE"
 
 for(value in 1:length(listBeta))
