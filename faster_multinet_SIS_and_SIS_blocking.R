@@ -168,7 +168,7 @@ for(e in 1: experimentsNumber)
 	  new_recovered <- NULL
 	  
 	  #tablica stanów w sieci  SIR
-	  layersAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
+	  layersAttributes <- get_values_ml(net,"state",actors_ml(net,layerName))
 	  actualInfectedInLayer <- which(layersAttributes   == "I") 
 	 	 # print (actualInfectedInLayer)
 	  
@@ -218,7 +218,7 @@ for(e in 1: experimentsNumber)
 	  new_unawarened <- NULL # nieœwiadomi versus wypieraj¹cy
 	  
 	  #tablica stanów w sieci SIS
-	  networkAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
+	  networkAttributes <- get_values_ml(net,"state",actors_ml(net,layerName))
 	  actualInfectedInNetwork <- which(networkAttributes   == "I") 
 	 	  #print (actualInfectedInNetwork)
 	  print(length(actualInfectedInNetwork))
