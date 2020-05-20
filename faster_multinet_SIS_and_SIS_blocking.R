@@ -1,11 +1,11 @@
 # biblioteka 
 library(multinet)
 
-listBeta <- c(0.19,0.28,0.22)
-listgamma <-c(0.1,0.08,0.02)
+listBeta <- c(0.19,0.28,0.22,0.31)
+listgamma <-c(0.1,0.08,0.02, 0.1)
 
-networkName <- "AUCS"
-countryDirectory <-"MoscowAthletics2013"
+networkName <- "MoscowAthletics2013"
+countryDirectory <-"Mno¿nikx2"
 scritpType<-"SIS&SIR_blocking"
 networkFileName <-"MoscowAthletics2013_4NoNatureNoLoops.edges"
 
@@ -170,8 +170,9 @@ for(e in 1: experimentsNumber)
 	  #tablica stanów w sieci  SIR
 	  layersAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
 	  actualInfectedInLayer <- which(layersAttributes   == "I") 
-	 	  print (actualInfectedInLayer)
+	 	 # print (actualInfectedInLayer)
 	  
+	  print(length(actualInfectedInLayer))
 	  
 	  if(length(actualInfectedInLayer) != 0)
 	  
@@ -219,9 +220,9 @@ for(e in 1: experimentsNumber)
 	  #tablica stanów w sieci SIS
 	  networkAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
 	  actualInfectedInNetwork <- which(networkAttributes   == "I") 
-	 	  print (actualInfectedInNetwork)
-	  
-	  
+	 	  #print (actualInfectedInNetwork)
+	  print(length(actualInfectedInNetwork))
+	  	  
 	  if(length(actualInfectedInNetwork) != 0)
 	  if(i>blockingTime)
 		 { #Pêtla dla SIS

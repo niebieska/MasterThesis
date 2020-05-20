@@ -1,10 +1,10 @@
 # biblioteka 
 library(multinet)
 
-listBeta <- c(0.19,0.28,0.22)
-listgamma <-c(0.1,0.08,0.02)
+listBeta <- c(0.19,0.28,0.22,0.31)
+listgamma <-c(0.1,0.08,0.02,0.1)
 networkName <- "MoscowAthletics2013"
-countryDirectory <-"Italy"
+countryDirectory <-"Mno¿nikx2"
 scritpType<-"SIS&SIR_default"
 networkFileName <-"MoscowAthletics2013_4NoNatureNoLoops.edges"
 network<-read_ml(paste("C:/Users/Paulina/Downloads/FullNet/",networkFileName,sep=""), name=networkName, sep=',', aligned=FALSE)
