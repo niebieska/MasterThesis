@@ -168,7 +168,7 @@ for(e in 1: experimentsNumber)
 	  new_recovered <- NULL
 	  
 	  #tablica stanów w sieci  SIR
-	  layersAttributes <- get_values_ml(net,"state",actors_ml(net,"work"))
+	  layersAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
 	  actualInfectedInLayer <- which(layersAttributes   == "I") 
 	 	  print (actualInfectedInLayer)
 	  
@@ -178,8 +178,8 @@ for(e in 1: experimentsNumber)
 	  # Pêtla SIR
 	  for (j in 1:length(actualInfectedInLayer)) # odwiedzam po kolei aktorów
 	  { 
-		if(get_values_ml(net,"state",layerActors[actualInfectedInLayer[j]]) =="I") # jeœli aktor jest zara¿ony
-		{ 
+		#if(get_values_ml(net,"state",layerActors[actualInfectedInLayer[j]]) =="I") # jeœli aktor jest zara¿ony
+		#{ 
 		  # szukamy s¹siadów 
 		  neighbors <- neighbors_ml(net,layerActors[actualInfectedInLayer[j]],layerName,mode="all")
 		  for(s in 1:length(neighbors))
@@ -206,7 +206,7 @@ for(e in 1: experimentsNumber)
 			new_recovered=cbind(new_recovered,layerActors[actualInfectedInLayer[j]])
 			}
 		  }
-		}
+		#}
 		
 	  }
 	  
@@ -217,7 +217,7 @@ for(e in 1: experimentsNumber)
 	  new_unawarened <- NULL # nieœwiadomi versus wypieraj¹cy
 	  
 	  #tablica stanów w sieci SIS
-	  networkAttributes <- get_values_ml(net,"state",actors_ml(net,"work"))
+	  networkAttributes <- get_values_ml(net,"state",actors_ml(net,"layerName"))
 	  actualInfectedInNetwork <- which(networkAttributes   == "I") 
 	 	  print (actualInfectedInNetwork)
 	  
@@ -227,8 +227,8 @@ for(e in 1: experimentsNumber)
 		 { #Pêtla dla SIS
 		  for(k in 1: length(actualInfectedInNetwork))
 		  {
-			if(get_values_ml(net,"state",networkActors[actualInfectedInNetwork[k]]) =="I")
-			{ 
+			#if(get_values_ml(net,"state",networkActors[actualInfectedInNetwork[k]]) =="I")
+			#{ 
 			  # poszukiwanie s¹siadów
 			  actorNeighbors <- neighbors_ml(net,networkActors[actualInfectedInNetwork[k]],layerName,mode="all")
 			  for(l in 1:length(actorNeighbors))
@@ -251,7 +251,7 @@ for(e in 1: experimentsNumber)
 				if(!is.element(networkActors[actualInfectedInNetwork[k]],new_unawarened)){ new_unawarened=cbind(new_unawarened,networkActors[actualInfectedInNetwork[k]])}
 				
 			  }
-			}
+			#}
 			
 		  }
 	  
