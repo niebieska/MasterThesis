@@ -1,43 +1,41 @@
 # biblioteka 
 library(multinet)
-listMultiply<- c(1,2,3,4)
+listMultiply <- c(1,2,3,4)
 listBeta <- c(0.19,0.28,0.22,0.31)
 listgamma <- c(0.1,0.08,0.02,0.1)
-networkName <- "MoscowAthletics2013"
+networkName <- "MoscowAthletics2013" 
 
 scritpType<-"SIS&SIR_blocking"
 networkFileName <-"MoscowAthletics2013_4NoNatureNoLoops.edges"
-network<-read_ml(paste("C:/Users/Tomek/Downloads/FullNet/",networkFileName,sep=""), name=networkName, sep=',', aligned=FALSE)
+network<-read_ml(paste("C:/Users/Paulina/Downloads/FullNet/",networkFileName,sep=""), name=networkName, sep=',', aligned=FALSE)
 
-layerName <- "RE"
+layerName <- "RE" 
 for( w in 1: length(listMultiply))
 {
   countryDirectory <- paste("MultiplyBy", listMultiply[w], sep="")
-for(value in 1:length(listBeta))
-{
-  if (value == 1){
-        # Parametry zapisu eksperymentu  -------------------------------------------------
-    # Folder roboczy
-    setwd("C:/Users/Tomek/Documents/MasterThesis/Eksperiments/")
+for(value in 1:length(listBeta)) 
+{ 
+  if (value == 1){ 
+    # Parametry zapisu eksperymentu  -------------------------------------------------
+    # Folder roboczy 
+    setwd("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/")
     getwd()
     #zmienne pomocniecze do zapisu
     experimentsMainDirectory<- paste("SIR&SIS",networkName, sep="-")
     if(dir.exists(experimentsMainDirectory) == FALSE) dir.create(experimentsMainDirectory)
     #folder dla eksperymentów 
-    setwd(paste("C:/Users/Tomek/Documents/MasterThesis/Eksperiments/", experimentsMainDirectory, sep=""))
+    setwd(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/", experimentsMainDirectory, sep=""))
     if(dir.exists(countryDirectory) == FALSE) dir.create(countryDirectory)
     setwd(paste(getwd(), countryDirectory,sep="/"))
   }
-  setwd(paste(paste("C:/Users/Tomek/Documents/MasterThesis/Eksperiments/",experimentsMainDirectory,sep=""),countryDirectory,sep="/"))  
+  setwd(paste(paste("C:/Users/Paulina/Documents/MasterThesis/Eksperiments/",experimentsMainDirectory,sep=""),countryDirectory,sep="/"))  
   mainDirectory <-paste(listBeta[value],listgamma[value], sep = "-")
   if(dir.exists(mainDirectory) == FALSE) dir.create(mainDirectory)
   setwd(paste(getwd(),mainDirectory, sep="/") )
   if(dir.exists(scritpType) == FALSE) dir.create(scritpType)
   setwd(paste(getwd(),scritpType, sep="/") )
   getwd()
-
 experimentsNumber <- 20 
-
 for(e in 1:experimentsNumber)
 {	
     net <- network
