@@ -4,7 +4,7 @@
 * multinet_SIR&SIS_default_accelerated- scenariusz z rozprzestrzenianiem informacji i wirusa
 * multinet_SIR_only_accelerated- rozprzestrzenianie samego wirusa
 * RunScripts - kolejne uruchamianie skryptów
-##Katalogi
+## Katalogi
 * faster-with-attributes - wersja skryptów z bibliotecznymi atrybutami dla ograniczonego zbioru aktorów
 * slow-scripts - pierwsze wersje skryptów dla wszystkich aktorów
 * Plots - skrypty do  utworzenia wykresów
